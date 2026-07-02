@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Psychology — Ledger</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<link rel="stylesheet" href="css/styles.css">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0A0E14">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="icon" href="icons/icon-192.png">
+<script>if('serviceWorker' in navigator){window.addEventListener('load',()=>{navigator.serviceWorker.register('sw.js').catch(()=>{});});}</script>
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="brand">
+    <div class="brand-mark"><svg viewBox="0 0 24 24" fill="none" stroke="#08150F" stroke-width="2.5"><path d="M3 17l6-6 4 4 8-8"/><path d="M17 7h4v4"/></svg></div>
+    <div class="brand-name">Ledger</div>
+  </div>
+
+  <div class="nav-section-label">Overview</div>
+  <a class="nav-item" href="dashboard.html" style="text-decoration:none;">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>
+    Dashboard
+  </a>
+  <a class="nav-item" href="trades.html" style="text-decoration:none;">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19h16M6 15l4-5 3 3 5-7"/></svg>
+    Trade History
+  </a>
+  <a class="nav-item" href="calendar.html" style="text-decoration:none;">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 3v3M16 3v3"/></svg>
+    Calendar
+  </a>
+  <a class="nav-item" href="journal.html" style="text-decoration:none;">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h13l3 4v12a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1z"/><path d="M8 9h8M8 13h8M8 17h5"/></svg>
+    Journal
+  </a>
+
+  <div class="nav-section-label">Analysis</div>
+  <a class="nav-item" href="statistics.html" style="text-decoration:none;">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M7 15l4-4 3 3 5-6"/></svg>
+    Statistics
+  </a>
+  <div class="nav-item active">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 2"/></svg>
+    Psychology
+  </div>
+  <div class="nav-item" title="Coming in the next phase">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 6v6l4 2"/><circle cx="12" cy="12" r="2.2" fill="currentColor" stroke="none"/></svg>
+    Goals
+  </div>
+
+  <div class="nav-section-label">Tools</div>
+  <div class="nav-item" title="Coming in the next phase">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M8 7h8M8 11h8M8 15h4"/></svg>
+    Risk Calculator
+  </div>
+  <a class="nav-item" href="settings.html" style="text-decoration:none;" title="Manage accounts & sync tokens in Settings">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v4M12 18v4M4.9 4.9l2.8 2.8M16.3 16.3l2.8 2.8M2 12h4M18 12h4M4.9 19.1l2.8-2.8M16.3 7.7l2.8-2.8"/></svg>
+    MT5 Sync
+  </a>
+  <a class="nav-item" href="settings.html" style="text-decoration:none;">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1-1.6 1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.6-1 1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.9.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.6 1.7 1.7 0 0 0 1.9-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.9V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.6 1z"/></svg>
+    Settings
+  </a>
+
+  <div class="sidebar-foot" id="userFoot" style="cursor:pointer;" title="Sign out">
+    <div class="avatar" id="userAvatar">--</div>
+    <div><div class="who" id="userName">Loading…</div><div class="plan" id="userSub">Sign out</div></div>
+  </div>
+</aside>
+
+<main class="main">
+
+  <div class="topbar">
+    <div class="topbar-left">
+      <h1>Psychology</h1>
+      <p>Discipline, confidence, and behavioral patterns from your journal and trade tags</p>
+    </div>
+    <div class="topbar-right">
+      <div class="sync-status" id="syncStatus"><span class="sync-dot status-offline" id="syncDot"></span><span id="syncStatusText">Connecting…</span></div>
+    </div>
+  </div>
+
+  <div class="psych-kpi-row">
+    <div class="kpi-card"><div class="kpi-label">Avg Discipline</div><div class="kpi-value num" id="kpiDiscipline">—</div></div>
+    <div class="kpi-card"><div class="kpi-label">Avg Confidence</div><div class="kpi-value num" id="kpiConfidence">—</div></div>
+    <div class="kpi-card"><div class="kpi-label">Avg Emotion</div><div class="kpi-value num" id="kpiEmotion">—</div></div>
+    <div class="kpi-card"><div class="kpi-label">Journaled Trades</div><div class="kpi-value num" id="kpiJournaled">0</div></div>
+  </div>
+
+  <div class="card" style="margin-bottom:14px;">
+    <div class="card-head"><div class="card-title">Score Trends</div><div class="card-sub" style="margin-top:0;">From your journal entries, over time</div></div>
+    <div class="chart-wrap" style="height:220px;"><canvas id="trendChart"></canvas></div>
+    <div class="empty-state" id="trendEmpty" style="display:none;">
+      <div class="title">No scored journal entries yet</div>
+      <div class="sub">Score your discipline, confidence, and emotion when you journal a trade to see trends here.</div>
+    </div>
+  </div>
+
+  <div class="grid-row charts-row">
+    <div class="card">
+      <div class="card-head"><div class="card-title">P&amp;L by Emotion</div></div>
+      <div class="mini-chart-wrap"><canvas id="emotionPnlChart"></canvas></div>
+      <div class="empty-state" id="emotionPnlEmpty" style="display:none;"><div class="sub">Tag an emotion on your trades to see this.</div></div>
+    </div>
+    <div class="card">
+      <div class="card-head"><div class="card-title">Behavioral Patterns</div><div class="card-sub" style="margin-top:0;">Frequency of tagged mistakes</div></div>
+      <div class="mini-chart-wrap"><canvas id="patternChart"></canvas></div>
+      <div class="empty-state" id="patternEmpty" style="display:none;"><div class="sub">Tag mistakes like FOMO, Revenge Trading, or Overtrading on your trades to see this.</div></div>
+    </div>
+    <div class="card">
+      <div class="card-head"><div class="card-title">Cost of Each Pattern</div><div class="card-sub" style="margin-top:0;">Total P&amp;L on trades tagged with each mistake</div></div>
+      <div class="mini-chart-wrap"><canvas id="patternCostChart"></canvas></div>
+      <div class="empty-state" id="patternCostEmpty" style="display:none;"><div class="sub">Tag mistakes on your trades to see this.</div></div>
+    </div>
+  </div>
+
+</main>
+
+<script type="module" src="js/pages/psychology.js"></script>
+</body>
+</html>

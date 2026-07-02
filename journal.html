@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Journal — Ledger</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0A0E14">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="icon" href="icons/icon-192.png">
+<script>if('serviceWorker' in navigator){window.addEventListener('load',()=>{navigator.serviceWorker.register('sw.js').catch(()=>{});});}</script>
+</head>
+<body>
+
+<!-- ================= SIDEBAR ================= -->
+<aside class="sidebar">
+  <div class="brand">
+    <div class="brand-mark">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#08150F" stroke-width="2.5"><path d="M3 17l6-6 4 4 8-8"/><path d="M17 7h4v4"/></svg>
+    </div>
+    <div class="brand-name">Ledger</div>
+  </div>
+
+  <div class="nav-section-label">Overview</div>
+  <a class="nav-item" href="dashboard.html" style="text-decoration:none;">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>
+    Dashboard
+  </a>
+  <a class="nav-item" href="trades.html" style="text-decoration:none;">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19h16M6 15l4-5 3 3 5-7"/></svg>
+    Trade History
+  </a>
+  <a class="nav-item" href="calendar.html" style="text-decoration:none;">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 3v3M16 3v3"/></svg>
+    Calendar
+  </a>
+  <div class="nav-item active">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h13l3 4v12a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1z"/><path d="M8 9h8M8 13h8M8 17h5"/></svg>
+    Journal
+  </div>
+
+  <div class="nav-section-label">Analysis</div>
+  <a class="nav-item" href="statistics.html" style="text-decoration:none;">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M7 15l4-4 3 3 5-6"/></svg>
+    Statistics
+  </a>
+  <a class="nav-item" href="psychology.html" style="text-decoration:none;">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 2"/></svg>
+    Psychology
+  </a>
+  <a class="nav-item" href="goals.html" style="text-decoration:none;">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 6v6l4 2"/><circle cx="12" cy="12" r="2.2" fill="currentColor" stroke="none"/></svg>
+    Goals
+  </a>
+
+  <div class="nav-section-label">Tools</div>
+  <a class="nav-item" href="risk-calculator.html" style="text-decoration:none;">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M8 7h8M8 11h8M8 15h4"/></svg>
+    Risk Calculator
+  </a>
+  <a class="nav-item" href="settings.html" style="text-decoration:none;" title="Manage accounts & sync tokens in Settings">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v4M12 18v4M4.9 4.9l2.8 2.8M16.3 16.3l2.8 2.8M2 12h4M18 12h4M4.9 19.1l2.8-2.8M16.3 7.7l2.8-2.8"/></svg>
+    MT5 Sync
+  </a>
+  <a class="nav-item" href="settings.html" style="text-decoration:none;">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1-1.6 1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.6-1 1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.9.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.6 1.7 1.7 0 0 0 1.9-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.9V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.6 1z"/></svg>
+    Settings
+  </a>
+
+  <div class="sidebar-foot" id="userFoot" style="cursor:pointer;" title="Sign out">
+    <div class="avatar" id="userAvatar">--</div>
+    <div>
+      <div class="who" id="userName">Loading…</div>
+      <div class="plan" id="userSub">Sign out</div>
+    </div>
+  </div>
+</aside>
+
+<!-- ================= MAIN ================= -->
+<main class="main">
+
+  <!-- ============ LIST VIEW ============ -->
+  <div class="journal-view active" id="listView">
+    <div class="topbar">
+      <div class="topbar-left">
+        <h1>Journal</h1>
+        <p id="journalSummary">Loading entries…</p>
+      </div>
+      <div class="topbar-right">
+        <div class="sync-status" id="syncStatus">
+          <span class="sync-dot status-offline" id="syncDot"></span>
+          <span id="syncStatusText">Connecting…</span>
+        </div>
+        <button class="btn-primary" id="newEntryBtn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+          New Entry
+        </button>
+      </div>
+    </div>
+
+    <div class="toolbar">
+      <div class="search-box">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+        <input type="text" id="searchInput" placeholder="Search lessons, notes, pair…">
+      </div>
+      <div class="toolbar-spacer"></div>
+      <select id="linkFilter">
+        <option value="">All entries</option>
+        <option value="linked">Linked to a trade</option>
+        <option value="standalone">Standalone / daily</option>
+      </select>
+    </div>
+
+    <div id="journalList"></div>
+    <div class="empty-state" id="journalEmpty" style="display:none;">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 4h13l3 4v12a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1z"/><path d="M8 9h8M8 13h8M8 17h5"/></svg>
+      <div class="title">No journal entries yet</div>
+      <div class="sub">Reflect on a trade or write a daily journal entry to start building your edge.</div>
+    </div>
+  </div>
+
+  <!-- ============ EDITOR VIEW ============ -->
+  <div class="journal-view" id="editorView">
+    <div class="journal-editor-head">
+      <div class="back-btn" id="backToList">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>
+        Journal
+      </div>
+      <div style="flex:1;"></div>
+      <div class="sync-status" id="syncStatus2" style="opacity:0.7;"><span class="sync-dot status-offline" id="syncDot2"></span><span id="syncStatusText2">—</span></div>
+      <button class="btn-primary" id="saveEntryBtn">Save Entry</button>
+    </div>
+
+    <div class="card" style="max-width:760px;">
+      <div class="journal-section">
+        <div class="journal-section-title">Basics</div>
+        <div class="form-grid">
+          <div class="field"><label for="jEntryDate">Entry Date *</label><input type="date" id="jEntryDate" required></div>
+          <div class="field"><label for="jLinkedTrade">Linked Trade</label><select id="jLinkedTrade"><option value="">— Standalone / daily entry —</option></select></div>
+        </div>
+      </div>
+
+      <div class="journal-section">
+        <div class="journal-section-title">Pre-Trade</div>
+        <div class="journal-field"><label for="jPreTradeAnalysis">Pre-Trade Analysis</label><textarea id="jPreTradeAnalysis"></textarea></div>
+        <div class="journal-field"><label for="jEntryReason">Entry Reason</label><textarea id="jEntryReason"></textarea></div>
+        <div class="journal-field"><label for="jMarketStructure">Market Structure</label><textarea id="jMarketStructure"></textarea></div>
+        <div class="journal-field"><label for="jTradePlan">Trade Plan</label><textarea id="jTradePlan"></textarea></div>
+      </div>
+
+      <div class="journal-section">
+        <div class="journal-section-title">During the Trade</div>
+        <div class="journal-field"><label for="jExecutionNotes">Execution Notes</label><textarea id="jExecutionNotes"></textarea></div>
+        <div class="journal-field"><label for="jManagementNotes">Management Notes</label><textarea id="jManagementNotes"></textarea></div>
+      </div>
+
+      <div class="journal-section">
+        <div class="journal-section-title">Post-Trade Review</div>
+        <div class="journal-field"><label for="jExitReason">Exit Reason</label><textarea id="jExitReason"></textarea></div>
+        <div class="journal-field"><label for="jLessonsLearned">Lessons Learned</label><textarea id="jLessonsLearned"></textarea></div>
+        <div class="journal-field"><label for="jWhatWentWell">What Went Well</label><textarea id="jWhatWentWell"></textarea></div>
+        <div class="journal-field"><label for="jWhatWentWrong">What Went Wrong</label><textarea id="jWhatWentWrong"></textarea></div>
+        <div class="journal-field"><label for="jImprovements">Improvements</label><textarea id="jImprovements"></textarea></div>
+      </div>
+
+      <div class="journal-section">
+        <div class="journal-section-title">Psychology</div>
+        <div class="journal-field"><label for="jPsychologyNotes">Psychology Notes</label><textarea id="jPsychologyNotes"></textarea></div>
+        <div class="score-row">
+          <div class="journal-field"><label for="jEmotionScore">Emotion (1–10)</label><input type="number" id="jEmotionScore" min="1" max="10"></div>
+          <div class="journal-field"><label for="jConfidenceScore">Confidence (1–10)</label><input type="number" id="jConfidenceScore" min="1" max="10"></div>
+          <div class="journal-field"><label for="jDisciplineScore">Discipline (1–10)</label><input type="number" id="jDisciplineScore" min="1" max="10"></div>
+        </div>
+        <div class="journal-field"><label for="jMistakeNotes">Mistake Notes</label><textarea id="jMistakeNotes"></textarea></div>
+      </div>
+
+      <div class="form-actions">
+        <button type="button" class="btn-ghost" id="deleteEntryBtn" style="color:var(--coral); border-color:rgba(255,107,107,0.25);">Delete Entry</button>
+        <div style="flex:1;"></div>
+        <button type="button" class="btn-primary" id="saveEntryBtn2">Save Entry</button>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<div class="toast-stack" id="toastStack"></div>
+
+<script type="module" src="js/pages/journal.js"></script>
+</body>
+</html>

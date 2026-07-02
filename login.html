@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sign in — Ledger</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css">
+<style>
+  body{ display:block; }
+  .auth-page{ background:
+      radial-gradient(1200px 600px at 15% -10%, rgba(61,220,151,0.06), transparent),
+      radial-gradient(1000px 500px at 100% 100%, rgba(124,158,255,0.05), transparent),
+      var(--bg);
+  }
+</style>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0A0E14">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="icon" href="icons/icon-192.png">
+<script>if('serviceWorker' in navigator){window.addEventListener('load',()=>{navigator.serviceWorker.register('sw.js').catch(()=>{});});}</script>
+</head>
+<body>
+
+<div class="auth-page">
+  <div class="auth-card">
+    <div class="auth-brand">
+      <div class="brand-mark">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#08150F" stroke-width="2.5"><path d="M3 17l6-6 4 4 8-8"/><path d="M17 7h4v4"/></svg>
+      </div>
+      <div class="brand-name">Ledger</div>
+    </div>
+
+    <div id="loginPane">
+      <div class="auth-title">Welcome back</div>
+      <div class="auth-sub">Sign in to sync your trades across every device.</div>
+      <div class="auth-error" id="loginError"></div>
+      <form class="auth-form" id="loginForm">
+        <div class="field">
+          <label for="loginEmail">Email</label>
+          <input type="email" id="loginEmail" autocomplete="email" required>
+        </div>
+        <div class="field">
+          <label for="loginPassword">Password</label>
+          <input type="password" id="loginPassword" autocomplete="current-password" required>
+        </div>
+        <button type="submit" class="btn-primary auth-submit" id="loginSubmit">Sign in</button>
+      </form>
+      <div class="auth-switch">Don't have an account? <a id="showRegister">Create one</a></div>
+    </div>
+
+    <div id="registerPane" style="display:none;">
+      <div class="auth-title">Create your account</div>
+      <div class="auth-sub">Free forever. Your data syncs automatically once you're in.</div>
+      <div class="auth-error" id="registerError"></div>
+      <form class="auth-form" id="registerForm">
+        <div class="field">
+          <label for="registerName">Name</label>
+          <input type="text" id="registerName" autocomplete="name" required>
+        </div>
+        <div class="field">
+          <label for="registerEmail">Email</label>
+          <input type="email" id="registerEmail" autocomplete="email" required>
+        </div>
+        <div class="field">
+          <label for="registerPassword">Password</label>
+          <input type="password" id="registerPassword" autocomplete="new-password" minlength="8" required>
+          <div class="field-error">At least 8 characters.</div>
+        </div>
+        <button type="submit" class="btn-primary auth-submit" id="registerSubmit">Create account</button>
+      </form>
+      <div class="auth-switch">Already have an account? <a id="showLogin">Sign in</a></div>
+    </div>
+  </div>
+</div>
+
+<script type="module" src="js/pages/login.js"></script>
+</body>
+</html>
