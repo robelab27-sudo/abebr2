@@ -119,6 +119,8 @@ export function computeAdvancedStats(trades) {
     totalTrades: closed.length,
   };
 }
+
+export function computeDashboardStats(trades, startingBalance = 0) {
   const closed = trades.filter(isClosed).sort((a, b) => tradeSortKey(a).localeCompare(tradeSortKey(b)));
 
   const wins = closed.filter((t) => t.net_profit > 0);
