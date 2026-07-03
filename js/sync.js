@@ -7,7 +7,7 @@
 // truth for what the UI renders.
 // ============================================================================
 
-import { api, NetworkError } from './api.js';
+import { api, ApiError, NetworkError } from './api.js';
 import { getAll, getById, putMany, getMeta, setMeta, getQueue, clearQueueEntries, SYNCED_STORES } from './db.js';
 import { SYNC_INTERVAL_MS, SYNC_DEBOUNCE_MS } from './config.js';
 
