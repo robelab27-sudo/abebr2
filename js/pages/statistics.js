@@ -39,6 +39,31 @@ const MINT = '#3DDC97', CORAL = '#FF6B6B', PERIWINKLE = '#7C9EFF', AMBER = '#F5B
 const charts = {};
 function destroy(key) { if (charts[key]) { charts[key].destroy(); charts[key] = null; } }
 
+const ALL_CHART_IDS = ['equityChart', 'winLossChart', 'rrChart', 'periodChart', 'pairChart', 'strategyChart', 'weekdayChart', 'longShortChart', 'emotionChart', 'mistakeChart'];
+
+// Captured once, before any render ever runs, so we always have a stable
+// handle on each chart's wrapper — even after its canvas has been swapped
+// out for an empty-state message and back again.
+const CHART_WRAPS = {};
+for (const id of ALL_CHART_IDS) {
+  const el = document.getElementById(id);
+  if (el) CHART_WRAPS[id] = el.parentElement;
+}
+
+/** Show an empty-state message in place of a chart, without losing the ability to restore it later. */
+function showEmptyState(canvasId, message) {
+  const wrap = CHART_WRAPS[canvasId];
+  if (wrap) wrap.innerHTML = `<div class="empty-state"><div class="sub">${message}</div></div>`;
+}
+
+/** Put the <canvas> back if a previous render replaced it with an empty-state message. */
+function restoreCanvas(canvasId) {
+  const wrap = CHART_WRAPS[canvasId];
+  if (wrap && !document.getElementById(canvasId)) {
+    wrap.innerHTML = `<canvas id="${canvasId}"></canvas>`;
+  }
+}
+
 let allTrades = [];
 let currentPeriod = 'monthly';
 
@@ -273,9 +298,10 @@ function renderEmotionChart(closed) {
   destroy('emotion');
   const withEmotion = closed.filter((t) => t.emotion);
   if (withEmotion.length === 0) {
-    document.getElementById('emotionChart').parentElement.innerHTML = '<div class="empty-state"><div class="sub">Tag an emotion on your trades to see this chart.</div></div>';
+    showEmptyState('emotionChart', 'Tag an emotion on your trades to see this chart.');
     return;
   }
+  restoreCanvas('emotionChart');
   const counts = new Map();
   for (const t of withEmotion) counts.set(t.emotion, (counts.get(t.emotion) || 0) + 1);
   const entries = [...counts.entries()].sort((a, b) => b[1] - a[1]);
@@ -297,9 +323,10 @@ function renderMistakeChart(closed) {
   }
   const entries = [...counts.entries()].sort((a, b) => b[1] - a[1]).slice(0, 8);
   if (entries.length === 0) {
-    document.getElementById('mistakeChart').parentElement.innerHTML = '<div class="empty-state"><div class="sub">Tag mistakes on your trades to see this chart.</div></div>';
+    showEmptyState('mistakeChart', 'Tag mistakes on your trades to see this chart.');
     return;
   }
+  restoreCanvas('mistakeChart');
 
   charts.mistake = new Chart(document.getElementById('mistakeChart'), {
     type: 'bar',
@@ -348,13 +375,12 @@ async function renderAll() {
   renderMetricGrid(adv);
 
   if (closed.length === 0) {
-    ['equityChart', 'winLossChart', 'rrChart', 'periodChart', 'pairChart', 'strategyChart', 'weekdayChart', 'longShortChart', 'emotionChart', 'mistakeChart'].forEach((id) => {
-      document.getElementById(id).parentElement.innerHTML = '<div class="empty-state"><div class="sub">No data yet.</div></div>';
-    });
+    ALL_CHART_IDS.forEach((id) => showEmptyState(id, 'No data yet.'));
     renderBWTable(null);
     return;
   }
 
+  ALL_CHART_IDS.forEach((id) => restoreCanvas(id));
   renderEquityChart(dash);
   renderWinLossChart(dash);
   renderRRChart(closed);
