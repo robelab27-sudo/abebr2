@@ -82,4 +82,34 @@ export const api = {
 
   // Health check (useful for a manual "test connection" button in Settings)
   health: () => request('GET', '/api/health', { auth: false }),
+
+  // Screenshots
+  listScreenshots: (tradeId) => request('GET', `/api/screenshots?trade_id=${encodeURIComponent(tradeId)}`),
+  uploadScreenshot: (formData) => requestForm('POST', '/api/screenshots', formData),
+  updateScreenshot: (id, changes) => request('PUT', `/api/screenshots/${id}`, { body: changes }),
+  replaceScreenshotFile: (id, formData) => requestForm('PUT', `/api/screenshots/${id}/file`, formData),
+  deleteScreenshot: (id) => request('DELETE', `/api/screenshots/${id}`),
+  getScreenshotFileUrl: (id) => `${API_BASE_URL}/api/screenshots/${id}/file`,
 };
+
+/** Like request(), but sends FormData (for file uploads) instead of JSON — no Content-Type header, the browser sets the correct multipart boundary itself. */
+async function requestForm(method, path, formData) {
+  const headers = {};
+  const token = await getMeta('auth_token');
+  if (token) headers.Authorization = `Bearer ${token}`;
+
+  let response;
+  try {
+    response = await fetch(`${API_BASE_URL}${path}`, { method, headers, body: formData });
+  } catch (err) {
+    throw new NetworkError(err.message || 'Network request failed.');
+  }
+
+  let data = null;
+  try { data = await response.json(); } catch { /* no body */ }
+
+  if (!response.ok) {
+    throw new ApiError(data?.error || `Request failed with status ${response.status}`, response.status, data?.details);
+  }
+  return data;
+}
