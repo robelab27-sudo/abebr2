@@ -6,6 +6,7 @@
 // ============================================================================
 
 import { tradesRepo } from '../repositories/index.js';
+import { mountScreenshotManager } from './screenshot-manager.js';
 
 let mounted = false;
 let resolveCurrent = null;
@@ -45,6 +46,11 @@ function modalMarkup() {
             <select id="tStatus"><option value="closed">Closed</option><option value="open">Open</option><option value="breakeven">Break-even</option></select>
           </div>
           <div class="field span-2"><label for="tNotes">Notes</label><textarea id="tNotes" placeholder="What happened on this trade?"></textarea></div>
+        </div>
+        <div class="journal-section" style="margin-top:6px;">
+          <div class="journal-section-title">Screenshots</div>
+          <div id="tradeModalScreenshots"></div>
+          <div class="card-sub" id="tradeModalScreenshotsHint" style="display:none;">Save the trade first, then add screenshots here by editing it.</div>
         </div>
         <div class="form-actions">
           <button type="button" class="btn-ghost" id="tradeModalCancel">Cancel</button>
@@ -150,6 +156,18 @@ export function openTradeModal({ mode = 'create', trade = null } = {}) {
   }
 
   document.getElementById('tradeModalOverlay').classList.remove('hidden');
+
+  const screenshotsContainer = document.getElementById('tradeModalScreenshots');
+  const screenshotsHint = document.getElementById('tradeModalScreenshotsHint');
+  if (mode === 'edit' && trade?.id) {
+    screenshotsHint.style.display = 'none';
+    screenshotsContainer.style.display = 'block';
+    mountScreenshotManager(screenshotsContainer, trade.id);
+  } else {
+    screenshotsContainer.style.display = 'none';
+    screenshotsContainer.innerHTML = '';
+    screenshotsHint.style.display = 'block';
+  }
 
   return new Promise((resolve) => { resolveCurrent = resolve; });
 }
