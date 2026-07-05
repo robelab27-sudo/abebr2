@@ -162,7 +162,7 @@ export function openTradeModal({ mode = 'create', trade = null } = {}) {
   if (mode === 'edit' && trade?.id) {
     screenshotsHint.style.display = 'none';
     screenshotsContainer.style.display = 'block';
-    mountScreenshotManager(screenshotsContainer, trade.id);
+    mountScreenshotManager(screenshotsContainer, { tradeId: trade.id });
   } else {
     screenshotsContainer.style.display = 'none';
     screenshotsContainer.innerHTML = '';
