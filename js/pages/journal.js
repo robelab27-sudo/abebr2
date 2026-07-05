@@ -8,6 +8,7 @@ import { requireAuth, logout } from '../auth.js';
 import { syncManager, SYNC_STATUS } from '../sync.js';
 import { journalRepo, tradesRepo } from '../repositories/index.js';
 import { applyThemeForUser } from '../theme.js';
+import { mountScreenshotManager } from '../components/screenshot-manager.js';
 
 const user = await requireAuth();
 if (user) await applyThemeForUser(user.id);
@@ -167,6 +168,23 @@ function showEditor(entryId) {
   if (!entry) document.getElementById('jEntryDate').value = new Date().toISOString().slice(0, 10);
 
   document.getElementById('deleteEntryBtn').style.display = entry ? 'inline-flex' : 'none';
+
+  const shotsHint = document.getElementById('shotsHintSection');
+  const preContainer = document.getElementById('shotsPreTrade');
+  const duringContainer = document.getElementById('shotsDuringTrade');
+  const postContainer = document.getElementById('shotsPostTrade');
+
+  if (entry?.id) {
+    shotsHint.style.display = 'none';
+    mountScreenshotManager(preContainer, { journalEntryId: entry.id, category: 'pre_trade' });
+    mountScreenshotManager(duringContainer, { journalEntryId: entry.id, category: 'during_trade' });
+    mountScreenshotManager(postContainer, { journalEntryId: entry.id, category: 'post_trade' });
+  } else {
+    shotsHint.style.display = 'block';
+    preContainer.innerHTML = '';
+    duringContainer.innerHTML = '';
+    postContainer.innerHTML = '';
+  }
 
   document.getElementById('listView').classList.remove('active');
   document.getElementById('editorView').classList.add('active');
