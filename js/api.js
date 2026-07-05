@@ -84,7 +84,13 @@ export const api = {
   health: () => request('GET', '/api/health', { auth: false }),
 
   // Screenshots
-  listScreenshots: (tradeId) => request('GET', `/api/screenshots?trade_id=${encodeURIComponent(tradeId)}`),
+  listScreenshots: ({ tradeId, journalEntryId, category } = {}) => {
+    const params = new URLSearchParams();
+    if (tradeId) params.set('trade_id', tradeId);
+    if (journalEntryId) params.set('journal_entry_id', journalEntryId);
+    if (category) params.set('category', category);
+    return request('GET', `/api/screenshots?${params.toString()}`);
+  },
   uploadScreenshot: (formData) => requestForm('POST', '/api/screenshots', formData),
   updateScreenshot: (id, changes) => request('PUT', `/api/screenshots/${id}`, { body: changes }),
   replaceScreenshotFile: (id, formData) => requestForm('PUT', `/api/screenshots/${id}/file`, formData),
