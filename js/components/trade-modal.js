@@ -7,11 +7,13 @@
 
 import { tradesRepo } from '../repositories/index.js';
 import { mountScreenshotManager } from './screenshot-manager.js';
+import { getAccounts, getActiveAccountId } from '../lib/account-context.js';
 
 let mounted = false;
 let resolveCurrent = null;
 let currentMode = 'create'; // 'create' | 'edit'
 let currentEditId = null;
+let currentAccounts = [];
 
 function modalMarkup() {
   return `
@@ -28,6 +30,9 @@ function modalMarkup() {
           <div class="field"><label for="tPair">Pair *</label><input type="text" id="tPair" placeholder="EURUSD" required></div>
           <div class="field"><label for="tDirection">Direction *</label>
             <select id="tDirection" required><option value="buy">Buy</option><option value="sell">Sell</option></select>
+          </div>
+          <div class="field span-2"><label for="tAccount">Account</label>
+            <select id="tAccount"><option value="">Unassigned</option></select>
           </div>
           <div class="field"><label for="tEntryDate">Entry Date *</label><input type="date" id="tEntryDate" required></div>
           <div class="field"><label for="tExitDate">Exit Date</label><input type="date" id="tExitDate"></div>
@@ -109,6 +114,23 @@ function mount() {
       source: 'manual',
     };
 
+    const accountId = document.getElementById('tAccount').value || null;
+    data.account_id = accountId;
+    if (accountId) {
+      const account = currentAccounts.find((a) => a.id === accountId);
+      if (account) {
+        data.prop_firm = account.prop_firm || '';
+        data.broker = account.broker || '';
+        data.account_name = account.account_name || '';
+        data.account_number = account.account_number || '';
+      }
+    } else {
+      data.prop_firm = '';
+      data.broker = '';
+      data.account_name = '';
+      data.account_number = '';
+    }
+
     try {
       const saved = currentMode === 'edit'
         ? await tradesRepo.update(currentEditId, data)
@@ -131,13 +153,23 @@ function mount() {
  * @param {object|null} [options.trade=null] - prefill values. For 'edit', must include `id`.
  * @returns {Promise<object|null>} the saved trade, or null if the user cancelled.
  */
-export function openTradeModal({ mode = 'create', trade = null } = {}) {
+export async function openTradeModal({ mode = 'create', trade = null } = {}) {
   mount();
   currentMode = mode;
   currentEditId = mode === 'edit' && trade ? trade.id : null;
 
   document.getElementById('tradeModalTitle').textContent = mode === 'edit' ? 'Edit Trade' : 'Add Trade';
   document.getElementById('tradeModalForm').reset();
+
+  // Populate the account dropdown. New trades default to whichever account
+  // is currently active in the topbar switcher; editing a trade shows
+  // whatever account it's already assigned to.
+  const [accounts, activeAccountId] = await Promise.all([getAccounts(), getActiveAccountId()]);
+  currentAccounts = accounts;
+  const accountSelect = document.getElementById('tAccount');
+  accountSelect.innerHTML = '<option value="">Unassigned</option>' +
+    accounts.map((a) => `<option value="${a.id}">${a.account_name}${a.prop_firm ? ' — ' + a.prop_firm : ''}</option>`).join('');
+  accountSelect.value = mode === 'edit' ? (trade?.account_id || '') : (activeAccountId || '');
 
   if (trade) {
     const FIELD_TO_KEY = {
