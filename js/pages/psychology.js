@@ -9,6 +9,8 @@ import { requireAuth, logout } from '../auth.js';
 import { syncManager, SYNC_STATUS } from '../sync.js';
 import { journalRepo, tradesRepo } from '../repositories/index.js';
 import { applyThemeForUser } from '../theme.js';
+import { mountAccountSwitcher } from '../components/account-switcher.js';
+import { getActiveAccountId } from '../lib/account-context.js';
 
 const user = await requireAuth();
 if (user) await applyThemeForUser(user.id);
@@ -40,9 +42,12 @@ const charts = {};
 function destroy(key) { if (charts[key]) { charts[key].destroy(); charts[key] = null; } }
 
 async function renderAll() {
-  const [entries, trades] = await Promise.all([journalRepo.list(), tradesRepo.list()]);
-  renderKpis(entries);
-  renderTrendChart(entries);
+  const [entries, allTrades, activeAccountId] = await Promise.all([journalRepo.list(), tradesRepo.list(), getActiveAccountId()]);
+  const trades = activeAccountId ? allTrades.filter((t) => t.account_id === activeAccountId) : allTrades;
+  const tradeIds = new Set(trades.map((t) => t.id));
+  const scopedEntries = activeAccountId ? entries.filter((e) => !e.trade_id || tradeIds.has(e.trade_id)) : entries;
+  renderKpis(scopedEntries);
+  renderTrendChart(scopedEntries);
   renderEmotionPnlChart(trades);
   renderPatternCharts(trades);
 }
@@ -154,5 +159,8 @@ function renderPatternCharts(trades) {
     options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { callback: (v) => '$' + v } }, y: { grid: { display: false } } } },
   });
 }
+
+await mountAccountSwitcher(document.getElementById('acctSwitcherContainer'));
+window.addEventListener('account-changed', () => renderAll());
 
 await renderAll();
