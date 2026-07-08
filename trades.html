@@ -7,6 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/styles.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0A0E14">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
@@ -88,6 +89,7 @@
       <p id="resultsSummary">Loading trades…</p>
     </div>
     <div class="topbar-right">
+      <div id="acctSwitcherContainer"></div>
       <div class="sync-status" id="syncStatus">
         <span class="sync-dot status-offline" id="syncDot"></span>
         <span id="syncStatusText">Connecting…</span>
@@ -121,7 +123,7 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0-1 14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2L4 6"/></svg>
       Recycle Bin
     </div>
-    <input type="file" id="importFile" accept=".csv,.json" style="display:none;">
+    <input type="file" id="importFile" accept=".csv,.json,.xlsx,.xls" style="display:none;">
     <div class="toolbar-btn" id="importBtn">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12m0 0l-4-4m4 4l4-4M4 21h16"/></svg>
       Import
