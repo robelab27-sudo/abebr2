@@ -10,6 +10,8 @@ import { syncManager, SYNC_STATUS } from '../sync.js';
 import { tradesRepo, calendarNotesRepo } from '../repositories/index.js';
 import { openTradeModal } from '../components/trade-modal.js';
 import { applyThemeForUser } from '../theme.js';
+import { mountAccountSwitcher } from '../components/account-switcher.js';
+import { getActiveAccountId } from '../lib/account-context.js';
 
 const user = await requireAuth();
 if (user) await applyThemeForUser(user.id);
@@ -87,8 +89,9 @@ document.getElementById('todayBtn').addEventListener('click', () => { viewDate =
 // Data loading
 // ---------------------------------------------------------------------------
 async function refreshData() {
-  allTrades = await tradesRepo.list();
-  calendarNotes = await calendarNotesRepo.list();
+  const [trades, notes, activeAccountId] = await Promise.all([tradesRepo.list(), calendarNotesRepo.list(), getActiveAccountId()]);
+  allTrades = activeAccountId ? trades.filter((t) => t.account_id === activeAccountId) : trades;
+  calendarNotes = notes;
   renderAll();
 }
 
@@ -282,5 +285,8 @@ function renderAll() {
   renderMonthlyStats();
   renderMonthlyNotes();
 }
+
+await mountAccountSwitcher(document.getElementById('acctSwitcherContainer'));
+window.addEventListener('account-changed', () => refreshData());
 
 await refreshData();
