@@ -9,6 +9,8 @@ import { tradesRepo } from '../repositories/index.js';
 import { getById } from '../db.js';
 import { computeDashboardStats, computeAdvancedStats } from '../stats.js';
 import { applyThemeForUser } from '../theme.js';
+import { mountAccountSwitcher } from '../components/account-switcher.js';
+import { getActiveAccountId, getAccounts } from '../lib/account-context.js';
 
 const user = await requireAuth();
 if (user) await applyThemeForUser(user.id);
@@ -362,9 +364,15 @@ function renderBWTable(adv) {
 // Full render
 // ---------------------------------------------------------------------------
 async function renderAll() {
-  allTrades = await tradesRepo.list();
-  const settings = user ? await getById('settings', user.id) : null;
-  const startingBalance = settings?.starting_balance || 0;
+  const [trades, settings, activeAccountId, accountsResult] = await Promise.all([
+    tradesRepo.list(),
+    user ? getById('settings', user.id) : null,
+    getActiveAccountId(),
+    getAccounts(),
+  ]);
+  allTrades = activeAccountId ? trades.filter((t) => t.account_id === activeAccountId) : trades;
+  const activeAccount = accountsResult.find((a) => a.id === activeAccountId);
+  const startingBalance = activeAccount ? (activeAccount.starting_balance || 0) : (settings?.starting_balance || 0);
 
   const closed = allTrades.filter((t) => t.trade_status === 'closed' && typeof t.net_profit === 'number' && !t.deleted_at);
   const dash = computeDashboardStats(allTrades, startingBalance);
@@ -393,5 +401,8 @@ async function renderAll() {
   renderMistakeChart(closed);
   renderBWTable(adv);
 }
+
+await mountAccountSwitcher(document.getElementById('acctSwitcherContainer'));
+window.addEventListener('account-changed', () => renderAll());
 
 await renderAll();
