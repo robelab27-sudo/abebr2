@@ -9,6 +9,10 @@ import { syncManager, SYNC_STATUS } from '../sync.js';
 import { journalRepo, tradesRepo } from '../repositories/index.js';
 import { applyThemeForUser } from '../theme.js';
 import { mountScreenshotManager } from '../components/screenshot-manager.js';
+import { mountAccountSwitcher } from '../components/account-switcher.js';
+import { getActiveAccountId } from '../lib/account-context.js';
+
+let activeAccountId = null; // cached locally since renderList() runs synchronously
 
 const user = await requireAuth();
 if (user) await applyThemeForUser(user.id);
@@ -83,6 +87,10 @@ function currentFilters() {
 function renderList() {
   const f = currentFilters();
   let filtered = [...entries];
+
+  if (activeAccountId) {
+    filtered = filtered.filter((e) => !e.trade_id || tradeById(e.trade_id)?.account_id === activeAccountId);
+  }
 
   if (f.link === 'linked') filtered = filtered.filter((e) => e.trade_id);
   if (f.link === 'standalone') filtered = filtered.filter((e) => !e.trade_id);
@@ -236,5 +244,9 @@ document.getElementById('deleteEntryBtn').addEventListener('click', async () => 
   entries = await journalRepo.list();
   showList();
 });
+
+await mountAccountSwitcher(document.getElementById('acctSwitcherContainer'));
+activeAccountId = await getActiveAccountId();
+window.addEventListener('account-changed', (e) => { activeAccountId = e.detail.accountId; renderList(); });
 
 await loadData();
