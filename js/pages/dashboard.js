@@ -13,6 +13,8 @@ import { getById } from '../db.js';
 import { computeDashboardStats } from '../stats.js';
 import { openTradeModal } from '../components/trade-modal.js';
 import { applyThemeForUser } from '../theme.js';
+import { mountAccountSwitcher } from '../components/account-switcher.js';
+import { getActiveAccountId, getAccounts } from '../lib/account-context.js';
 
 const user = await requireAuth();
 if (user) await applyThemeForUser(user.id);
@@ -337,14 +339,21 @@ function renderKpis(stats) {
 // Full render pass
 // ---------------------------------------------------------------------------
 async function renderAll() {
-  const [trades, journalEntries, settings] = await Promise.all([
+  const [allTrades, allJournalEntries, settings, activeAccountId, accounts] = await Promise.all([
     tradesRepo.list(),
     journalRepo.list(),
     user ? getById('settings', user.id) : null,
+    getActiveAccountId(),
+    getAccounts(),
   ]);
 
+  const trades = activeAccountId ? allTrades.filter((t) => t.account_id === activeAccountId) : allTrades;
+  const tradeIds = new Set(trades.map((t) => t.id));
+  const journalEntries = activeAccountId ? allJournalEntries.filter((e) => !e.trade_id || tradeIds.has(e.trade_id)) : allJournalEntries;
+
   currentTrades = trades;
-  const startingBalance = settings?.starting_balance || 0;
+  const activeAccount = accounts.find((a) => a.id === activeAccountId);
+  const startingBalance = activeAccount ? (activeAccount.starting_balance || 0) : (settings?.starting_balance || 0);
   const stats = computeDashboardStats(trades, startingBalance);
 
   renderKpis(stats);
@@ -356,6 +365,9 @@ async function renderAll() {
   renderRecentTrades(stats.recentTrades);
   renderPsychology(journalEntries);
 }
+
+mountAccountSwitcher(document.getElementById('acctSwitcherContainer'));
+window.addEventListener('account-changed', () => renderAll());
 
 await renderAll();
 
