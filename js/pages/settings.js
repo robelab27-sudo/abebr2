@@ -12,6 +12,7 @@ import { applyTheme } from '../theme.js';
 import { api, NetworkError } from '../api.js';
 import { getAll } from '../db.js';
 import { downloadFile } from '../lib/csv.js';
+import { invalidateAccountsCache } from '../lib/account-context.js';
 
 const user = await requireAuth();
 if (!user) throw new Error('redirecting to login');
@@ -161,10 +162,12 @@ async function loadAccounts() {
     for (const account of accounts) {
       const row = document.createElement('div');
       row.className = 'account-row';
+      const syncInfo = lastSyncLabel(account.updated_at);
       row.innerHTML = `
         <div class="account-info">
           <div class="name">${escapeHtml(account.account_name)}</div>
           <div class="meta">${[account.prop_firm, account.broker, account.account_number].filter(Boolean).map(escapeHtml).join(' · ') || 'No broker details set'}</div>
+          <div class="meta" style="margin-top:4px;"><span class="sync-dot ${syncInfo.dotClass}" style="display:inline-block; vertical-align:middle; margin-right:6px;"></span>${syncInfo.text}</div>
         </div>
         <div class="account-row-actions">
           <span class="token-pill" data-copy-token="${account.sync_token}" title="Click to copy sync token">${account.sync_token.slice(0, 10)}…</span>
@@ -191,6 +194,27 @@ function escapeHtml(str) {
   return div.innerHTML;
 }
 
+/**
+ * Turns an account's updated_at into a "Last synced" status. The MT5 EA
+ * touches this timestamp every time it successfully connects (every ~60s
+ * while running), so recent = EA is actively connected right now; stale =
+ * either not running or not attached to this account.
+ */
+function lastSyncLabel(updatedAt) {
+  if (!updatedAt) return { text: 'Never synced', dotClass: 'status-offline' };
+  const ageMs = Date.now() - new Date(updatedAt).getTime();
+  const minutes = Math.floor(ageMs / 60000);
+
+  if (minutes < 3) return { text: 'Synced just now — MT5 EA is connected', dotClass: 'status-synced' };
+  if (minutes < 10) return { text: `Last synced ${minutes}m ago`, dotClass: 'status-synced' };
+  if (minutes < 60) return { text: `Last synced ${minutes}m ago — check the EA is still running`, dotClass: 'status-offline' };
+
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return { text: `Last synced ${hours}h ago`, dotClass: 'status-offline' };
+  const days = Math.floor(hours / 24);
+  return { text: `Last synced ${days}d ago`, dotClass: 'status-offline' };
+}
+
 document.getElementById('accountsList').addEventListener('click', async (event) => {
   const copyEl = event.target.closest('[data-copy-token]');
   if (copyEl) {
@@ -207,11 +231,13 @@ document.getElementById('accountsList').addEventListener('click', async (event) 
     if (!confirm('Rotate this account\'s sync token? Any MT5 EA already configured with the old token will need updating.')) return;
     await api.rotateAccountToken(id);
     showToast('Sync token rotated');
+    await invalidateAccountsCache();
     loadAccounts();
   } else if (action === 'deactivate') {
     if (!confirm('Remove this account? Existing trades keep their history either way.')) return;
     await api.deleteAccount(id);
     showToast('Account removed');
+    await invalidateAccountsCache();
     loadAccounts();
   }
 });
@@ -240,6 +266,7 @@ document.getElementById('saveAccountBtn').addEventListener('click', async () => 
     document.getElementById('addAccountForm').style.display = 'none';
     document.getElementById('addAccountForm').querySelectorAll('input').forEach((i) => (i.value = ''));
     showToast('Account added');
+    await invalidateAccountsCache();
     loadAccounts();
   } catch (err) {
     showToast(err instanceof NetworkError ? "Can't reach the server — you're offline." : 'Could not add account.', 'error');
