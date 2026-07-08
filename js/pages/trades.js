@@ -11,8 +11,13 @@ import { requireAuth, logout } from '../auth.js';
 import { syncManager, SYNC_STATUS } from '../sync.js';
 import { tradesRepo } from '../repositories/index.js';
 import { openTradeModal } from '../components/trade-modal.js';
-import { tradesToCSV, parseCSV, normalizeImportedTrade, downloadFile } from '../lib/csv.js';
+import { tradesToCSV, downloadFile } from '../lib/csv.js';
+import { parseImportFile } from '../lib/broker-import.js';
 import { applyThemeForUser } from '../theme.js';
+import { mountAccountSwitcher } from '../components/account-switcher.js';
+import { getActiveAccountId } from '../lib/account-context.js';
+
+let activeAccountId = null; // cached locally since getFilteredSorted() runs synchronously
 
 const user = await requireAuth();
 if (user) await applyThemeForUser(user.id);
@@ -71,6 +76,8 @@ function currentFilters() {
 function getFilteredSorted() {
   const f = currentFilters();
   let trades = rawTrades.filter((t) => (showingRecycleBin ? Boolean(t.deleted_at) : !t.deleted_at));
+
+  if (activeAccountId) trades = trades.filter((t) => t.account_id === activeAccountId);
 
   if (f.search) {
     trades = trades.filter((t) =>
@@ -342,18 +349,21 @@ document.getElementById('importBtn').addEventListener('click', () => document.ge
 document.getElementById('importFile').addEventListener('change', async (event) => {
   const file = event.target.files[0];
   if (!file) return;
-  const text = await file.text();
 
+  let format = '';
   let incoming = [];
   try {
-    if (file.name.toLowerCase().endsWith('.json')) {
-      const parsed = JSON.parse(text);
-      incoming = Array.isArray(parsed) ? parsed : (parsed.trades || []);
-    } else {
-      incoming = parseCSV(text).map(normalizeImportedTrade);
-    }
+    const result = await parseImportFile(file);
+    format = result.format;
+    incoming = result.trades;
   } catch (err) {
-    showToast('Could not parse that file. Check it is a valid CSV or JSON export.', 'error');
+    showToast(err.message || 'Could not parse that file. Check it is a valid export.', 'error');
+    event.target.value = '';
+    return;
+  }
+
+  if (incoming.length === 0) {
+    showToast(`No trades found in that file (detected format: ${format || 'unknown'}).`, 'error');
     event.target.value = '';
     return;
   }
@@ -374,6 +384,8 @@ document.getElementById('importFile').addEventListener('change', async (event) =
       direction: (raw.direction || 'buy').toLowerCase(),
       entry_date: raw.entry_date,
       exit_date: raw.exit_date || null,
+      entry_time: raw.entry_time || null,
+      exit_time: raw.exit_time || null,
       entry_price: raw.entry_price ?? null,
       exit_price: raw.exit_price ?? null,
       stop_loss: raw.stop_loss ?? null,
@@ -391,9 +403,17 @@ document.getElementById('importFile').addEventListener('change', async (event) =
     imported++;
   }
 
-  showToast(`Imported ${imported} trade${imported === 1 ? '' : 's'}${skipped ? `, skipped ${skipped} duplicate/invalid` : ''}`);
+  showToast(`Imported ${imported} trade${imported === 1 ? '' : 's'} from ${format}${skipped ? `, skipped ${skipped} duplicate/invalid` : ''}`);
   event.target.value = '';
   await loadAndRender();
+});
+
+await mountAccountSwitcher(document.getElementById('acctSwitcherContainer'));
+activeAccountId = await getActiveAccountId();
+window.addEventListener('account-changed', (e) => {
+  activeAccountId = e.detail.accountId;
+  currentPage = 1;
+  renderTable();
 });
 
 await loadAndRender();
