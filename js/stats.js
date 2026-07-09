@@ -88,7 +88,13 @@ export function computeAdvancedStats(trades) {
     const entries = [...map.entries()];
     if (entries.length === 0) return { best: null, worst: null };
     entries.sort((a, b) => b[1] - a[1]);
-    return { best: entries[0], worst: entries[entries.length - 1] };
+    // With only one distinct value (e.g. you've only ever traded one pair),
+    // "best" and "worst" would be the same entry — show it once as best and
+    // leave worst empty instead of confusingly duplicating it.
+    return {
+      best: entries[0],
+      worst: entries.length > 1 ? entries[entries.length - 1] : null,
+    };
   };
 
   const pairBW = bestWorst((t) => t.pair);
