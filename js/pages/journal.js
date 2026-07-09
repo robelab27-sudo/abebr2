@@ -164,7 +164,7 @@ function populateTradeSelect() {
     sorted.map((t) => `<option value="${t.id}">${escapeHtml(t.pair)} ${t.direction === 'buy' ? '▲' : '▼'} · ${t.entry_date} · ${t.net_profit >= 0 ? '+' : ''}$${(t.net_profit || 0).toFixed(2)}</option>`).join('');
 }
 
-function showEditor(entryId) {
+async function showEditor(entryId) {
   currentEditId = entryId;
   const entry = entryId ? entries.find((e) => e.id === entryId) : null;
 
@@ -184,9 +184,28 @@ function showEditor(entryId) {
 
   if (entry?.id) {
     shotsHint.style.display = 'none';
-    mountScreenshotManager(preContainer, { journalEntryId: entry.id, category: 'pre_trade' });
-    mountScreenshotManager(duringContainer, { journalEntryId: entry.id, category: 'during_trade' });
-    mountScreenshotManager(postContainer, { journalEntryId: entry.id, category: 'post_trade' });
+    const waitingMsg = '<div class="card-sub">Syncing this entry before enabling screenshots…</div>';
+    preContainer.innerHTML = waitingMsg;
+    duringContainer.innerHTML = waitingMsg;
+    postContainer.innerHTML = waitingMsg;
+
+    // Screenshot uploads go straight to the server and need the journal
+    // entry to already exist there. Local saves are instant, but sync to
+    // the server happens on a short debounce — force it now so a
+    // just-created entry is guaranteed to be there before we let the user
+    // try to attach an image to it.
+    await syncManager.syncNow();
+
+    if (syncManager.status === SYNC_STATUS.OFFLINE || syncManager.status === SYNC_STATUS.ERROR) {
+      const offlineMsg = '<div class="card-sub">Can\'t attach screenshots while offline — reconnect and reopen this entry.</div>';
+      preContainer.innerHTML = offlineMsg;
+      duringContainer.innerHTML = offlineMsg;
+      postContainer.innerHTML = offlineMsg;
+    } else {
+      mountScreenshotManager(preContainer, { journalEntryId: entry.id, category: 'pre_trade' });
+      mountScreenshotManager(duringContainer, { journalEntryId: entry.id, category: 'during_trade' });
+      mountScreenshotManager(postContainer, { journalEntryId: entry.id, category: 'post_trade' });
+    }
   } else {
     shotsHint.style.display = 'block';
     preContainer.innerHTML = '';
