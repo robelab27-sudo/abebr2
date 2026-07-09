@@ -8,6 +8,7 @@
 import { tradesRepo } from '../repositories/index.js';
 import { mountScreenshotManager } from './screenshot-manager.js';
 import { getAccounts, getActiveAccountId } from '../lib/account-context.js';
+import { syncManager, SYNC_STATUS } from '../sync.js';
 
 let mounted = false;
 let resolveCurrent = null;
@@ -194,7 +195,18 @@ export async function openTradeModal({ mode = 'create', trade = null } = {}) {
   if (mode === 'edit' && trade?.id) {
     screenshotsHint.style.display = 'none';
     screenshotsContainer.style.display = 'block';
-    mountScreenshotManager(screenshotsContainer, { tradeId: trade.id });
+    screenshotsContainer.innerHTML = '<div class="card-sub">Syncing this trade before enabling screenshots…</div>';
+
+    // Same reasoning as the journal entry case: screenshot uploads hit the
+    // server directly and need the trade to already exist there. A trade
+    // just created a moment ago might not have synced yet.
+    await syncManager.syncNow();
+
+    if (syncManager.status === SYNC_STATUS.OFFLINE || syncManager.status === SYNC_STATUS.ERROR) {
+      screenshotsContainer.innerHTML = '<div class="card-sub">Can\'t attach screenshots while offline — reconnect and reopen this trade.</div>';
+    } else {
+      mountScreenshotManager(screenshotsContainer, { tradeId: trade.id });
+    }
   } else {
     screenshotsContainer.style.display = 'none';
     screenshotsContainer.innerHTML = '';
