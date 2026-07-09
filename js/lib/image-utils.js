@@ -66,6 +66,7 @@ export async function fetchAuthenticatedImage(screenshotId) {
   const token = await getMeta('auth_token');
   const response = await fetch(`${API_BASE_URL}/api/screenshots/${screenshotId}/file`, {
     headers: token ? { Authorization: `Bearer ${token}` } : {},
+    cache: 'no-store',
   });
   if (!response.ok) throw new Error(`Failed to load image (${response.status})`);
   const blob = await response.blob();
