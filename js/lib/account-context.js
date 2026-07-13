@@ -8,6 +8,7 @@
 
 import { api } from '../api.js';
 import { getMeta, setMeta } from '../db.js';
+import { broadcast, onBroadcast } from './broadcast.js';
 
 const ACTIVE_ACCOUNT_KEY = 'active_account_id';
 const CACHED_ACCOUNTS_KEY = 'cached_accounts';
@@ -20,7 +21,17 @@ export async function getActiveAccountId() {
 export async function setActiveAccountId(accountId) {
   await setMeta(ACTIVE_ACCOUNT_KEY, accountId || null);
   window.dispatchEvent(new CustomEvent('account-changed', { detail: { accountId: accountId || null } }));
+  broadcast('account-changed', { accountId: accountId || null });
 }
+
+// Re-dispatch the same local event when another tab changes the active
+// account, so every page's existing 'account-changed' listener (which
+// already knows how to re-filter and re-render) just works without change.
+onBroadcast((msg) => {
+  if (msg.type === 'account-changed') {
+    window.dispatchEvent(new CustomEvent('account-changed', { detail: msg.payload }));
+  }
+});
 
 /** Returns the cached account list immediately, and refreshes it from the server in the background if online. */
 export async function getAccounts() {
