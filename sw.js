@@ -18,7 +18,7 @@
 // user opens the app after a deploy, they transparently get the new files.
 // ============================================================================
 
-const CACHE_VERSION = 'ledger-v2';
+const CACHE_VERSION = 'ledger-v3';
 const APP_SHELL = [
   '/', '/index.html', '/login.html', '/dashboard.html', '/trades.html',
   '/calendar.html', '/journal.html', '/statistics.html', '/psychology.html',
@@ -27,8 +27,9 @@ const APP_SHELL = [
   '/css/styles.css',
   '/js/config.js', '/js/db.js', '/js/api.js', '/js/auth.js', '/js/sync.js',
   '/js/stats.js', '/js/theme.js',
-  '/js/lib/csv.js',
-  '/js/components/trade-modal.js',
+  '/js/lib/csv.js', '/js/lib/broker-import.js', '/js/lib/image-utils.js',
+  '/js/lib/account-context.js', '/js/lib/broadcast.js',
+  '/js/components/trade-modal.js', '/js/components/screenshot-manager.js', '/js/components/account-switcher.js',
   '/js/repositories/index.js', '/js/repositories/repository.js', '/js/repositories/settings.js',
   '/js/pages/login.js', '/js/pages/dashboard.js', '/js/pages/trades.js', '/js/pages/calendar.js',
   '/js/pages/journal.js', '/js/pages/statistics.js', '/js/pages/psychology.js',
